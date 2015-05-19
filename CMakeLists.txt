@@ -1,5 +1,5 @@
-#    Copyright (C) 2015 Hewlett-Packard Development Company, L.P.
-#    All Rights Reserved.
+# Copyright (C) 2015 Hewlett-Packard Development Company, L.P.
+# All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -28,7 +28,7 @@ pkg_check_modules(OVSCOMMON libovscommon)
 pkg_check_modules(OVSDB libovsdb)
 
 include_directories (${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}
-   ${OVSCOMMON_INCLUDE_DIRS}
+                     ${OVSCOMMON_INCLUDE_DIRS}
 )
 
 # Source files to build fand
@@ -38,8 +38,8 @@ set (SOURCES fand.c physfan.c fanspeed.c fanstatus.c fandirection.c)
 add_executable (${FAND} ${SOURCES})
 
 target_link_libraries (${FAND} ${HALONUTILS_LIBRARIES} ${CONFIG_YAML_LIBRARIES} ${OVSCOMMON_LIBRARIES}
-		        ${OVSDB_LIBRARIES} ${OPENSSL_LIBRARIES} ${SYSTEMD_LIBRARIES}
-			-lpthread -lrt)
+                       ${OVSDB_LIBRARIES} ${OPENSSL_LIBRARIES} ${SYSTEMD_LIBRARIES}
+                       -lpthread -lrt)
 
 # Rules to install sysd binary in rootfs
 install(TARGETS ${FAND}
