@@ -47,6 +47,7 @@
 #include "timeval.h"
 #include "unixctl.h"
 #include "util.h"
+#include "dynamic-string.h"
 #include "openvswitch/vconn.h"
 #include "openvswitch/vlog.h"
 #include "vswitch-idl.h"
@@ -580,7 +581,46 @@ static void
 fand_unixctl_dump(struct unixctl_conn *conn, int argc OVS_UNUSED,
                           const char *argv[] OVS_UNUSED, void *aux OVS_UNUSED)
 {
-    unixctl_command_reply(conn, "Nothing to dump :)");
+    const struct locl_subsystem *subsystem = NULL;
+    const struct locl_fan *fan = NULL;
+    const struct shash_node *node = NULL;
+    const struct shash_node *fan_node = NULL;
+    struct ds ds = DS_EMPTY_INITIALIZER;
+
+    SHASH_FOR_EACH(node, &subsystem_data) {
+
+        subsystem = (struct locl_subsystem *)node->data;
+
+        ds_put_format(&ds, "Subsystem: %s\n", subsystem->name);
+
+        ds_put_format(&ds, "    Fan speed Override: %s\n",
+                      fan_speed_enum_to_string(subsystem->fan_speed_override));
+
+        ds_put_format(&ds, "    Fan speed: %s\n",
+                      fan_speed_enum_to_string(subsystem->fan_speed));
+
+        ds_put_cstr(&ds, "    Fan details:");
+
+        if (shash_is_empty(&subsystem->subsystem_fans)) {
+            ds_put_cstr(&ds, "No Fans found.\n");
+            continue;
+        }
+        ds_put_cstr(&ds, "\n");
+
+        SHASH_FOR_EACH(fan_node, &subsystem->subsystem_fans) {
+            fan = (struct locl_fan *)fan_node->data;
+            ds_put_format(&ds, "        Name: %s\n", fan->name);
+            ds_put_format(&ds, "            rpm: %d\n", fan->rpm);
+            ds_put_format(&ds, "            direction: %s\n",
+                          fan->direction);
+            ds_put_format(&ds, "            status: %s\n",
+                          fan_status_enum_to_string(fan->status));
+        }
+    }
+
+    unixctl_command_reply(conn, ds_cstr(&ds));
+
+    ds_destroy(&ds);
 }
 
 
