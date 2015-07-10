@@ -18,12 +18,9 @@ cmake_minimum_required (VERSION 2.8)
 set (FAND fand)
 project (${FAND})
 
-
 # Rules to locate needed libraries
 include(FindPkgConfig)
 pkg_check_modules(CONFIG_YAML config-yaml)
-pkg_check_modules(HALONUTILS halonutils)
-pkg_check_modules(SYSTEMD systemd)
 pkg_check_modules(OVSCOMMON libovscommon)
 pkg_check_modules(OVSDB libovsdb)
 
@@ -37,11 +34,10 @@ set (SOURCES fand.c physfan.c fanspeed.c fanstatus.c fandirection.c)
 # Rules to build fand
 add_executable (${FAND} ${SOURCES})
 
-target_link_libraries (${FAND} ${HALONUTILS_LIBRARIES} ${CONFIG_YAML_LIBRARIES} ${OVSCOMMON_LIBRARIES}
-                       ${OVSDB_LIBRARIES} ${OPENSSL_LIBRARIES} ${SYSTEMD_LIBRARIES}
+target_link_libraries (${FAND} ${CONFIG_YAML_LIBRARIES}
+                       ${OVSCOMMON_LIBRARIES} ${OVSDB_LIBRARIES}
                        -lpthread -lrt)
 
-# Rules to install sysd binary in rootfs
+# Rules to install fand binary in rootfs
 install(TARGETS ${FAND}
-	RUNTIME DESTINATION bin)
-
+        RUNTIME DESTINATION bin)
