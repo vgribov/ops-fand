@@ -451,7 +451,7 @@ fand_read_fan_fru_direction(
     }
     VLOG_DBG("direction is %08x (%08x)", value, direction_op->bit_mask);
 
-    /* HALON_TODO: code assumption: the value is a single bit that indicates
+    /* OPS_TODO: code assumption: the value is a single bit that indicates
        direction as either front-to-back or back-to-front. It would be better
        if we had an absolute value, but the i2c ops don't have bit shift values,
        so we can't do a direct comparison. */

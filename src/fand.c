@@ -60,13 +60,11 @@
 #include "physfan.h"
 #include "fand-locl.h"
 
-#define FAN_POLL_INTERVAL   5    /* HALON_TODO: should this be configurable? */
+#define FAN_POLL_INTERVAL   5    /* OPS_TODO: should this be configurable? */
                                  /*             or should it be vendor spec? */
                                  /*             making it fixed, for now... */
 
 #define MSEC_PER_SEC        1000
-
-#define DEFAULT_YAML_DIR    "/usr/local/halon/platform/hwdesc"
 
 #define NAME_IN_DAEMON_TABLE "fand"
 
@@ -138,7 +136,7 @@ add_subsystem(const struct ovsrec_subsystem *ovsrec_subsys)
     result->name = strdup(ovsrec_subsys->name);
     result->marked = false;
     result->valid = false;
-    result->parent_subsystem = NULL;  /* HALON_TODO: find parent subsystem */
+    result->parent_subsystem = NULL;  /* OPS_TODO: find parent subsystem */
     shash_init(&result->subsystem_fans);
     override = smap_get(&ovsrec_subsys->other_config, "fan_speed_override");
     if (override != NULL) {
@@ -146,7 +144,7 @@ add_subsystem(const struct ovsrec_subsystem *ovsrec_subsys)
     }
     result->fan_speed_override = override_value;
 
-    /* HALON_TODO: could check to see if the temp sensors have been populated
+    /* OPS_TODO: could check to see if the temp sensors have been populated
        with data and use that for the sensor speed when initializing the
        fan_speed value. */
     result->fan_speed = FAND_SPEED_NORMAL;
@@ -155,7 +153,9 @@ add_subsystem(const struct ovsrec_subsystem *ovsrec_subsys)
     dir = ovsrec_subsys->hw_desc_dir;
 
     if (dir == NULL || strlen(dir) == 0) {
-        dir = DEFAULT_YAML_DIR;
+        VLOG_ERR("No h/w description directory for subsystem %s",
+                 ovsrec_subsys->name);
+        return(NULL);
     }
 
     /* since this is a new subsystem, load all of the hardware description
@@ -255,7 +255,7 @@ add_subsystem(const struct ovsrec_subsystem *ovsrec_subsys)
             ovsrec_fan_set_name(ovs_fan, fan_name);
             ovsrec_fan_set_status(ovs_fan,
                 fan_status_enum_to_string(FAND_STATUS_UNINITIALIZED));
-            /* HALON_TODO: these have to be set, but "f2b" and "normal"
+            /* OPS_TODO: these have to be set, but "f2b" and "normal"
                may not be the right values for defaults. */
             ovsrec_fan_set_direction(ovs_fan, "f2b");
             ovsrec_fan_set_speed(ovs_fan, fan_speed_enum_to_string(FAND_SPEED_NORMAL));
@@ -340,7 +340,7 @@ fand_remove_unmarked_subsystems(void)
 
             shash_delete(&subsystem_data, node);
 
-            /* HALON_TODO: need to remove subsystem yaml data
+            /* OPS_TODO: need to remove subsystem yaml data
                            verify that ovsdb has deleted the fans (automatic) */
         }
     }
@@ -358,7 +358,7 @@ fand_init(const char *remote)
 
     idl = ovsdb_idl_create(remote, &ovsrec_idl_class, false, true);
     idl_seqno = ovsdb_idl_get_seqno(idl);
-    ovsdb_idl_set_lock(idl, "halon_fand");
+    ovsdb_idl_set_lock(idl, "ops_fand");
     ovsdb_idl_verify_write_only(idl);
 
     /* register interest in daemon table */
@@ -397,7 +397,7 @@ fand_init(const char *remote)
     ovsdb_idl_add_column(idl, &ovsrec_subsystem_col_fans);
     ovsdb_idl_omit_alert(idl, &ovsrec_subsystem_col_fans);
 
-    /* HALON_TODO: add temperature sensors status */
+    /* OPS_TODO: add temperature sensors status */
 
     unixctl_command_register("fand/dump", "", 0, 0,
                              fand_unixctl_dump, NULL);
@@ -554,7 +554,7 @@ fand_run(void)
     if (ovsdb_idl_is_lock_contended(idl)) {
         static struct vlog_rate_limit rl = VLOG_RATE_LIMIT_INIT(1, 1);
 
-        VLOG_ERR_RL(&rl, "another halon-fand process is running, "
+        VLOG_ERR_RL(&rl, "another ops-fand process is running, "
                     "disabling this process until it goes away");
 
         return;
@@ -567,7 +567,7 @@ fand_run(void)
 
     daemonize_complete();
     vlog_enable_async();
-    VLOG_INFO_ONCE("%s (Halon fand) %s", program_name, VERSION);
+    VLOG_INFO_ONCE("%s (OpenSwitch fand) %s", program_name, VERSION);
 }
 
 static void
@@ -624,7 +624,7 @@ fand_unixctl_dump(struct unixctl_conn *conn, int argc OVS_UNUSED,
 }
 
 
-static unixctl_cb_func halon_fand_exit;
+static unixctl_cb_func ops_fand_exit;
 
 static char *parse_options(int argc, char *argv[], char **unixctl_path);
 OVS_NO_RETURN static void usage(void);
@@ -652,7 +652,7 @@ main(int argc, char *argv[])
     if (retval) {
         exit(EXIT_FAILURE);
     }
-    unixctl_command_register("exit", "", 0, 0, halon_fand_exit, &exiting);
+    unixctl_command_register("exit", "", 0, 0, ops_fand_exit, &exiting);
 
     fand_init(remote);
     free(remote);
@@ -761,7 +761,7 @@ parse_options(int argc, char *argv[], char **unixctl_pathp)
 static void
 usage(void)
 {
-    printf("%s: Halon fand daemon\n"
+    printf("%s: OpenSwitch fand daemon\n"
            "usage: %s [OPTIONS] [DATABASE]\n"
            "where DATABASE is a socket on which ovsdb-server is listening\n"
            "      (default: \"unix:%s/db.sock\").\n",
@@ -777,7 +777,7 @@ usage(void)
 }
 
 static void
-halon_fand_exit(struct unixctl_conn *conn, int argc OVS_UNUSED,
+ops_fand_exit(struct unixctl_conn *conn, int argc OVS_UNUSED,
                   const char *argv[] OVS_UNUSED, void *exiting_)
 {
     bool *exiting = exiting_;
