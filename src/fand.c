@@ -1,5 +1,5 @@
 /*
- *  (c) Copyright 2015 Hewlett Packard Enterprise Development LP.
+ *  (c) Copyright 2015 Hewlett Packard Enterprise Development LP
  *  Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014 Nicira, Inc.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
