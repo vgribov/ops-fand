@@ -1,9 +1,9 @@
 # High level design of ops-fand
 
-See [thermal management design](http://www.openswitch.net/documents/dev/thermal_management_design) for a description of OpenSwitch thermal management.
+See [thermal management design](/documents/user/thermal_management_design) for a description of OpenSwitch thermal management.
 
 ## Reponsibilities
-The fan daemon reads the fan level values determined by the [temperature sensor daemon](http://www.openswitch.net/documents/dev/ops-tempd/DESIGN) and sets the fan speed to an appropriate value. The fan daemon also reads the RPM information from fans and reports the information so you can verify that the fans are operating properly.
+The fan daemon reads the fan level values determined by the [temperature sensor daemon](/documents/dev/ops-tempd/DESIGN) and sets the fan speed to an appropriate value. The fan daemon also reads the RPM information from fans and reports the information so you can verify that the fans are operating properly.
 
 ## Design choices
 ops-fand could have been merged with ops-tempdd. However, keeping these separate will accomodate future platforms with more involved thermal management strategies.
@@ -114,7 +114,7 @@ locl_fan: fan data
 ```
 
 ## References
-* [thermal management design](http://www.openswitch.net/documents/dev/thermal_management_design)
-* [config-yaml library](http://www.openswitch.net/documents/dev/ops-config-yaml/DESIGN)
-* [hardware description files](http://www.openswitch.net/documents/dev/ops-hw-config/DESIGN)
-* [temperature daemon](http://www.openswitch.net/documents/dev/ops-tempd/DESIGN)
+* [thermal management design](/documents/user/thermal_management_design)
+* [config-yaml library](/documents/dev/ops-config-yaml/DESIGN)
+* [hardware description files](/documents/dev/ops-hw-config/DESIGN)
+* [temperature daemon](/documents/dev/ops-tempd/DESIGN)
