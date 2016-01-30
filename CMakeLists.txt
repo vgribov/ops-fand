@@ -42,6 +42,9 @@ target_link_libraries (${FAND} ${CONFIG_YAML_LIBRARIES}
                        ${OVSCOMMON_LIBRARIES} ${OVSDB_LIBRARIES}
                        -lpthread -lrt)
 
+# Build ops-ledd cli shared libraries.
+add_subdirectory(src/cli)
+
 # Rules to install ops-fand binary in rootfs
 install(TARGETS ${FAND}
         RUNTIME DESTINATION bin)
