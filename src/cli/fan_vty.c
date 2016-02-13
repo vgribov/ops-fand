@@ -1,7 +1,7 @@
 /* FAN CLI commands file
  *
  * Copyright (C) 1997, 98 Kunihiro Ishiguro
- * Copyright (C) 2015 Hewlett Packard Enterprise Development LP
+ * Copyright (C) 2015-2016 Hewlett Packard Enterprise Development LP
  *
  * GNU Zebra is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,6 +38,7 @@
 #include "vtysh/vtysh_ovsdb_if.h"
 #include "vtysh/vtysh_ovsdb_config.h"
 #include "vtysh/utils/system_vtysh_utils.h"
+#include "vtysh_ovsdb_fan_context.h"
 
 VLOG_DEFINE_THIS_MODULE(vtysh_fan_cli);
 extern struct ovsdb_idl *idl;
@@ -209,8 +210,20 @@ void cli_pre_init(void)
  */
 void cli_post_init(void)
 {
+    vtysh_ret_val retval = e_vtysh_error;
+
     install_element (VIEW_NODE, &vtysh_show_system_fan_cmd);
     install_element (ENABLE_NODE, &vtysh_show_system_fan_cmd);
     install_element (CONFIG_NODE, &vtysh_fan_speed_cmd);
     install_element (CONFIG_NODE, &vtysh_no_fan_speed_cmd);
+    retval = install_show_run_config_subcontext(e_vtysh_config_context,
+                                     e_vtysh_config_context_fan,
+                                     &vtysh_config_context_fan_clientcallback,
+                                     NULL, NULL);
+    if(e_vtysh_ok != retval)
+    {
+        vtysh_ovsdb_config_logmsg(VTYSH_OVSDB_CONFIG_ERR,
+                         "config context unable to add fan client callback");
+        assert(0);
+    }
 }
