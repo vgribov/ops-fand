@@ -165,7 +165,7 @@ class FanSystemTests(OpsVsiTest):
             'Test to verify \'no fan-speed\' command - FAILED!'
         return True
 
-
+@pytest.mark.skipif(True, reason="Disabling old tests")
 class Test_sys_fan:
 
     def setup(self):
