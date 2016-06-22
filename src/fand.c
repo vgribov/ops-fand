@@ -193,6 +193,7 @@ add_subsystem(const struct ovsrec_subsystem *ovsrec_subsys)
     }
 
     result->multiplier = fan_info->fan_speed_multiplier;
+    result->numerator  = fan_info->fan_speed_numerator;
 
     /* count the total fans in the subsystem */
     total_fans = 0;
@@ -547,6 +548,7 @@ fand_reconfigure(struct ovsdb_idl *idl)
         }
 
         fand_set_fanspeed(subsystem);
+        fand_set_fanleds(subsystem);
 
         /* "mark" the subsystem, to indicate that it is still present */
         subsystem->marked = true;
