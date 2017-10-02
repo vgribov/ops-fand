@@ -122,7 +122,7 @@ add_subsystem(const struct ovsrec_subsystem *ovsrec_subsys)
     struct ovsdb_idl_txn *txn;
     struct ovsrec_fan **fan_array;
     int total_fan_idx;
-    unsigned int fan_fru_count;
+    int fan_fru_count;
     const char *dir;
     int fan_idx;
     const YamlFanInfo *fan_info;
